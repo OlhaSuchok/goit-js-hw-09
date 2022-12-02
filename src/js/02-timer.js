@@ -1,5 +1,6 @@
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
 const inputEL = document.querySelector('input[type="text"]');
 const buttonStartEl = document.querySelector('button[type="button"]');
@@ -25,11 +26,11 @@ const options = {
   // Функції, які запускаються щоразу, коли календар закривається. Перегляньте Events API
   onClose(selectedDates) {
     const validDate = selectedDates[0].getTime() > new Date().getTime();
-    const deltaTime = selectedDates[0].getTime() - new Date().getTime();
+    deltaTime = selectedDates[0].getTime() - new Date().getTime();
 
     if (!validDate) {
       buttonStartEl.setAttribute('disabled', true);
-      window.alert('Please choose a date in the future');
+      return Notify.failure('Please choose a date in the future');
     } else {
       buttonStartEl.removeAttribute('disabled');
     }
@@ -39,11 +40,12 @@ const options = {
 flatpickr('#datetime-picker', options);
 
 function onButtonClick(event) {
+  buttonStartEl.setAttribute('disabled', true);
   const startTime = new Date().getTime();
 
   const intervalId = setInterval(() => {
     const currentTime = new Date().getTime();
-    deltaTime = currentTime - startTime;
+    deltaTime -= 1000;
     const { days, hours, minutes, seconds } = convertMs(deltaTime);
     console.log(`${days}:${hours}:${minutes}:${seconds}`);
 
@@ -52,9 +54,9 @@ function onButtonClick(event) {
     valueDataMinutes.textContent = minutes;
     valueDataSeconds.textContent = seconds;
 
-    // if (deltaTime <= 0) {
-    //   clearInterval(intervalId);
-    // }
+    if (deltaTime <= 0) {
+      clearInterval(intervalId);
+    }
   }, 1000);
 }
 
