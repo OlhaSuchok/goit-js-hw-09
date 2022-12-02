@@ -25,7 +25,7 @@ const options = {
   onClose(selectedDates) {
     const validDate = selectedDates[0].getTime() > new Date().getTime();
 
-    dateDifference = selectedDates[0].getTime() - new Date().getTime();
+    const dateDifference = selectedDates[0].getTime() - new Date().getTime();
 
     if (!validDate) {
       buttonStartEl.setAttribute('disabled', true);
