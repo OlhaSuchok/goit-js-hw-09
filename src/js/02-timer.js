@@ -3,11 +3,12 @@ import 'flatpickr/dist/flatpickr.min.css';
 
 const inputEL = document.querySelector('input[type="text"]');
 const buttonStartEl = document.querySelector('button[type="button"]');
-const timer = document.querySelector('.timer');
 const valueDataDays = document.querySelector('[data-days]');
 const valueDataHours = document.querySelector('[data-hours]');
 const valueDataMinutes = document.querySelector('[data-minutes]');
 const valueDataSeconds = document.querySelector('[data-seconds]');
+
+let deltaTime = 0;
 
 buttonStartEl.addEventListener('click', onButtonClick);
 buttonStartEl.setAttribute('disabled', true);
@@ -24,8 +25,7 @@ const options = {
   // Функції, які запускаються щоразу, коли календар закривається. Перегляньте Events API
   onClose(selectedDates) {
     const validDate = selectedDates[0].getTime() > new Date().getTime();
-
-    const dateDifference = selectedDates[0].getTime() - new Date().getTime();
+    const deltaTime = selectedDates[0].getTime() - new Date().getTime();
 
     if (!validDate) {
       buttonStartEl.setAttribute('disabled', true);
@@ -39,11 +39,11 @@ const options = {
 flatpickr('#datetime-picker', options);
 
 function onButtonClick(event) {
-  const startTime = new Date();
+  const startTime = new Date().getTime();
 
-  setInterval(() => {
+  const intervalId = setInterval(() => {
     const currentTime = new Date().getTime();
-    const deltaTime = currentTime - startTime;
+    deltaTime = currentTime - startTime;
     const { days, hours, minutes, seconds } = convertMs(deltaTime);
     console.log(`${days}:${hours}:${minutes}:${seconds}`);
 
@@ -51,23 +51,22 @@ function onButtonClick(event) {
     valueDataHours.textContent = hours;
     valueDataMinutes.textContent = minutes;
     valueDataSeconds.textContent = seconds;
+
+    // if (deltaTime <= 0) {
+    //   clearInterval(intervalId);
+    // }
   }, 1000);
 }
 
 function convertMs(ms) {
-  // Number of milliseconds per unit of time
   const second = 1000;
   const minute = second * 60;
   const hour = minute * 60;
   const day = hour * 24;
 
-  // Remaining days
   const days = addLeadingZero(Math.floor(ms / day));
-  // Remaining hours
   const hours = addLeadingZero(Math.floor((ms % day) / hour));
-  // Remaining minutes
   const minutes = addLeadingZero(Math.floor(((ms % day) % hour) / minute));
-  // Remaining seconds
   const seconds = addLeadingZero(
     Math.floor((((ms % day) % hour) % minute) / second)
   );
